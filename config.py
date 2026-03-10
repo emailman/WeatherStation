@@ -1,6 +1,6 @@
 # config.py
 # User configuration and layout constants for the MicroPython weather station.
-# Edit this file to change WiFi credentials, location, or display geometry.
+# Edit this file to change Wi-Fi credentials, location, or display geometry.
 
 # ── User Configuration ──────────────────────────────────────────────
 WIFI_SSID     = "blinky"

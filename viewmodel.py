@@ -36,9 +36,9 @@ def _format_time(utc_offset_h):
     """
     local = time.localtime(time.mktime(time.localtime()) + utc_offset_h * 3600)
     h    = local[3]
-    ampm = "AM" if h < 12 else "PM"
+    am_pm = "AM" if h < 12 else "PM"
     h12  = h % 12 or 12
-    time_str = "{:02d}:{:02d}:{:02d} {}".format(h12, local[4], local[5], ampm)
+    time_str = "{:02d}:{:02d}:{:02d} {}".format(h12, local[4], local[5], am_pm)
     date_str = "{:02d}/{:02d}/{}".format(local[1], local[2], local[0])
     return time_str, date_str
 

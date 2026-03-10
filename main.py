@@ -14,7 +14,7 @@ import view
 _refresh_flag = False
 
 
-def _menu_irq(pin):
+def _menu_irq(_):
     global _refresh_flag
     _refresh_flag = True
 
@@ -30,7 +30,7 @@ def main():
     model.sync_ntp()
 
     screen = view.init_screen()
-    raw    = None
+    raw = None
     # force an immediate fetch on first iteration
     last_ms = time.ticks_add(time.ticks_ms(), -(config.REFRESH_SEC * 1000))
 
@@ -40,7 +40,7 @@ def main():
             _refresh_flag = False
             print("Fetching weather...")
             try:
-                raw     = model.fetch_weather(config.LATITUDE, config.LONGITUDE)
+                raw = model.fetch_weather(config.LATITUDE, config.LONGITUDE)
                 last_ms = time.ticks_ms()
                 print("Data:", raw)
             except Exception as e:

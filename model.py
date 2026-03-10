@@ -1,5 +1,5 @@
 # model.py
-# Network I/O: WiFi connection, NTP sync, and weather data fetching.
+# Network I/O: Wi-Fi connection, NTP sync, and weather data fetching.
 
 import network
 import urequests
