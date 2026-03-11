@@ -31,12 +31,12 @@ def _menu_irq(_):
 
 def _rot_up_irq(pin):
     global _rot_delta
-    _rot_delta += 1
+    _rot_delta -= 1
 
 
 def _rot_down_irq(pin):
     global _rot_delta
-    _rot_delta -= 1
+    _rot_delta += 1
 
 
 def _rot_press_irq(pin):
