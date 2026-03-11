@@ -33,7 +33,7 @@ def sync_ntp():
         return False
 
 
-def fetch_weather(lat, lon):
+def fetch_weather(lat, lon, utc_offset_h=None):
     """Fetch current conditions from Open-Meteo (free, no API key).
 
     Returns a plain dict with unit-converted values:

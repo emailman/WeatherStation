@@ -43,11 +43,13 @@ def _format_time(utc_offset_h):
     return time_str, date_str
 
 
-def build_display_state(raw):
+def build_display_state(raw, city_name=None, utc_offset_h=None):
     """Convert a raw model dict into a display-state dict consumed by the view.
 
     Args:
-        raw: dict returned by model.fetch_weather()
+        raw:          dict returned by model.fetch_weather()
+        city_name:    display name for the location (defaults to config.LOCATION_NAME)
+        utc_offset_h: UTC offset in hours for time formatting (defaults to config.UTC_OFFSET_H)
 
     Returns a dict with every value already formatted for direct rendering:
         temp_str       str   e.g. "72oF"
@@ -60,9 +62,13 @@ def build_display_state(raw):
         sunset         str   "HH:MM"
         time_str       str   "HH:MM:SS AM"
         date_str       str   "MM/DD/YYYY"
-        location       str   location name from config
+        location       str   location name
     """
-    time_str, date_str = _format_time(config.UTC_OFFSET_H)
+    if city_name is None:
+        city_name = config.LOCATION_NAME
+    if utc_offset_h is None:
+        utc_offset_h = config.UTC_OFFSET_H
+    time_str, date_str = _format_time(utc_offset_h)
     return {
         "temp_str":       _format_temperature(raw["temp"]),
         "humidity":       raw["humidity"],
@@ -74,5 +80,5 @@ def build_display_state(raw):
         "sunset":         raw["sunset"],
         "time_str":       time_str,
         "date_str":       date_str,
-        "location":       config.LOCATION_NAME,
+        "location":       city_name,
     }

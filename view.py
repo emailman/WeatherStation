@@ -342,9 +342,46 @@ def draw_display(screen, state):
     draw_left_panel(screen, state)
     draw_center_panel(screen, state)
     draw_right_panel(screen, state)
-
-    screen.show(mode=0)
     print("Display updated.")
+
+
+# ═══════════════════════════════════════════════════════════════════
+# City selection screen
+# ═══════════════════════════════════════════════════════════════════
+
+def draw_city_select(screen, cities, cursor):
+    """Render the city-selection list.
+
+    Args:
+        cities: sequence of (name, lat, lon, utc_offset_h) tuples
+        cursor: index of currently highlighted city
+    """
+    ROW_H = (config.H - config.TOP_H) // len(cities)  # 49 px for 5 cities
+
+    screen.fill(WHITE)
+
+    # Header bar
+    label = "SELECT CITY"
+    lx = (config.W - len(label) * 8) // 2
+    screen.text(label, lx, 7, BLACK)
+    screen.hline(0, config.TOP_H - 1, config.W, BLACK)
+
+    for i, city in enumerate(cities):
+        name = city[0]
+        row_y = config.TOP_H + i * ROW_H
+
+        if i == cursor:
+            screen.fill_rect(0, row_y, config.W, ROW_H, BLACK)
+            text_color = WHITE
+            prefix = "> "
+        else:
+            text_color = BLACK
+            prefix = "  "
+
+        row_text = prefix + name
+        tx = (config.W - len(row_text) * 8) // 2
+        ty = row_y + (ROW_H - 8) // 2
+        screen.text(row_text, tx, ty, text_color)
 
 
 def draw_error(screen, msg):
