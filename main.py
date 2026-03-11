@@ -19,7 +19,7 @@ _active_city = 4          # default: Rockville, MD (index 4 in CITIES)
 _cursor      = 4          # highlighted city in select screen
 
 # ── ISR flags ────────────────────────────────────────────────────────
-_refresh_flag = False
+_refresh_flag = True      # True at startup so city temps fetch immediately
 _rot_delta    = 0         # accumulated rotation ticks
 _rot_click    = False     # True when SW button pressed
 
@@ -60,10 +60,12 @@ def main():
     model.sync_ntp()
 
     screen = view.init_screen()
-    raw    = None
-    last_ms = time.ticks_ms()
+    raw               = None
+    _city_temps      = [None] * len(config.CITIES)
+    _city_conditions = [None] * len(config.CITIES)
+    last_ms           = time.ticks_ms()
 
-    view.draw_city_select(screen, config.CITIES, _cursor)
+    view.draw_city_select(screen, config.CITIES, _cursor, _city_temps, _city_conditions)
     screen.show(mode=0)
 
     while True:
@@ -71,16 +73,37 @@ def main():
 
         # ── City select mode ──────────────────────────────────────────
         if _app_state == STATE_CITY_SELECT:
+            changed = False
+
             if _rot_delta != 0:
                 _cursor = (_cursor + _rot_delta) % len(config.CITIES)
                 _rot_delta = 0
-                view.draw_city_select(screen, config.CITIES, _cursor)
-                screen.show(mode=0)
+                changed = True
+
             if _rot_click:
                 _rot_click = False
                 _active_city = _cursor
                 _app_state = STATE_WEATHER
                 _refresh_flag = True   # trigger immediate fetch for new city
+                continue
+
+            elapsed = time.ticks_diff(time.ticks_ms(), last_ms) // 1000
+            if elapsed >= config.REFRESH_SEC or _refresh_flag:
+                _refresh_flag = False
+                last_ms = time.ticks_ms()
+                for i, (name, lat, lon, utc_h) in enumerate(config.CITIES):
+                    print("Fetching temp for", name, "...")
+                    try:
+                        city_raw = model.fetch_weather(lat, lon, utc_h)
+                        _city_temps[i]      = viewmodel.format_city_temp(city_raw["temp"])
+                        _city_conditions[i] = viewmodel.wmo_condition(city_raw["code"])
+                    except Exception as e:
+                        print("Temp fetch error:", name, e)
+                changed = True
+
+            if changed:
+                view.draw_city_select(screen, config.CITIES, _cursor, _city_temps, _city_conditions)
+                screen.show(mode=0)
             continue
 
         # ── Weather display mode ──────────────────────────────────────
@@ -88,7 +111,7 @@ def main():
             _rot_click = False
             _cursor = _active_city     # start selection at current city
             _app_state = STATE_CITY_SELECT
-            view.draw_city_select(screen, config.CITIES, _cursor)
+            view.draw_city_select(screen, config.CITIES, _cursor, _city_temps, _city_conditions)
             screen.show(mode=0)
             continue
 

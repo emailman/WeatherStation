@@ -15,6 +15,29 @@ def _format_temperature(temp_f):
     return "-{}oF".format(abs(t))
 
 
+def format_city_temp(temp_f):
+    """Return a plain-text temperature string for city-select list, e.g. '72F'."""
+    t = int(round(temp_f))
+    return "{}F".format(t)
+
+
+def wmo_condition(code):
+    """Return a short plain-text description for a WMO weather code."""
+    if code == 0:
+        return "Clear"
+    if 1 <= code <= 3:
+        return "Cloudy"
+    if code in (45, 48):
+        return "Fog"
+    if (51 <= code <= 67) or (80 <= code <= 82):
+        return "Rain"
+    if 71 <= code <= 77:
+        return "Snow"
+    if code in (95, 96, 99):
+        return "Thunder"
+    return "Cloudy"
+
+
 def _format_pressure(press_inHg):
     """Return pressure formatted to two decimal places, e.g. '29.92'."""
     return "{:.2f}".format(press_inHg)

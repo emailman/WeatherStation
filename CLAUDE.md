@@ -11,9 +11,9 @@ every 10 minutes and renders it in a fixed panel layout.
 ```
 config.py      constants only, zero imports
 model.py       WiFi + NTP + HTTP fetch, returns plain dicts
-viewmodel.py   string formatting, returns a display-state dict
+viewmodel.py   string formatting, returns a display-state dict; also city-select helpers
 view.py        all draw_* functions, consumes display-state dict
-main.py        button ISR + polling loop, wires the layers
+main.py        button/encoder ISRs + polling loop, wires the layers
 ```
 
 **Layer boundaries to preserve:**
@@ -27,10 +27,10 @@ main.py        button ISR + polling loop, wires the layers
 ### model.fetch_weather() → raw dict
 ```python
 {
-    "temp":       float,   # Fahrenheit
+    "temp":       float,   # Fahrenheit (converted from °C)
     "humidity":   int,     # %
     "pressure":   float,   # inHg
-    "wind_speed": float,   # mph
+    "wind_speed": float,   # mph (converted from km/h — Open-Meteo default)
     "wind_dir":   int,     # degrees, 0=N clockwise
     "code":       int,     # WMO weather code
     "sunrise":    str,     # "HH:MM"
@@ -54,6 +54,26 @@ main.py        button ISR + polling loop, wires the layers
     "location":       str,
 }
 ```
+
+### viewmodel helpers for city-select screen
+- `viewmodel.format_city_temp(temp_f)` → plain string e.g. `"72F"` (no degree glyph; for `screen.text()`)
+- `viewmodel.wmo_condition(code)` → short condition string e.g. `"Rain"`, `"Clear"`, `"Thunder"`
+
+### view.draw_city_select(screen, cities, cursor, temps=None, conditions=None)
+- `temps` — list of temp strings from `format_city_temp`, one per city (or `None` if not yet fetched)
+- `conditions` — list of condition strings from `wmo_condition`, one per city (or `None`)
+- Both are shown right-aligned in each row: `[condition]  [temp]`
+
+## App states (main.py)
+
+```
+STATE_WEATHER     = 0   — weather display; rotary click → city select
+STATE_CITY_SELECT = 1   — city list; rotary click → confirm; rotate → move cursor
+```
+
+City temps and conditions are cached in `_city_temps` / `_city_conditions` lists and
+refreshed on the same `REFRESH_SEC` timer as the weather display. `_refresh_flag = True`
+at startup triggers an immediate first fetch for both modes.
 
 ## MicroPython constraints
 
@@ -80,6 +100,7 @@ main.py        button ISR + polling loop, wires the layers
 `view.draw_large_number(screen, text, x, y, h, color)` renders custom glyphs.
 Supported characters: `0-9`, `-`, `.`, `o` (degree symbol), `C`, `F`, ` `.
 The character `'o'` renders a small circle as a degree symbol — this is intentional.
+Do NOT use `'o'` in strings passed to `screen.text()` — use plain text helpers instead.
 
 ## Layout constants (config.py)
 
@@ -97,15 +118,15 @@ Panel centres derived from these:
 
 ## WMO weather codes handled
 
-| Code(s) | Icon |
-|---------|------|
-| 0 | Clear sky (sun + 8 rays) |
-| 1–3 | Cloudy (cloud outline) |
-| 45, 48 | Fog (4 horizontal dashes) |
-| 51–67, 80–82 | Rain (cloud + droplets) |
-| 71–77 | Snow (cloud + asterisk) |
-| 95, 96, 99 | Thunderstorm (cloud + lightning zigzag) |
-| anything else | Generic cloud |
+| Code(s) | Icon | Condition text |
+|---------|------|----------------|
+| 0 | Clear sky (sun + 8 rays) | "Clear" |
+| 1–3 | Cloudy (cloud outline) | "Cloudy" |
+| 45, 48 | Fog (4 horizontal dashes) | "Fog" |
+| 51–67, 80–82 | Rain (cloud + droplets) | "Rain" |
+| 71–77 | Snow (cloud + asterisk) | "Snow" |
+| 95, 96, 99 | Thunderstorm (cloud + lightning zigzag) | "Thunder" |
+| anything else | Generic cloud | "Cloudy" |
 
 ## Common tasks
 
@@ -115,7 +136,10 @@ Panel centres derived from these:
 `viewmodel.py`. Also update the unit suffix strings in `view.draw_center_panel()`
 for pressure.
 
-**Add a new WMO code:** Add an `elif` branch in `view.draw_weather_icon()`.
+**Add a new WMO code:** Add an `elif` branch in `view.draw_weather_icon()` and
+a matching branch in `viewmodel.wmo_condition()`.
+
+**Add a city:** Append a `(name, lat, lon, utc_offset_h)` tuple to `CITIES` in `config.py`.
 
 **Upload files:** `mpremote cp config.py model.py viewmodel.py view.py main.py :`
 

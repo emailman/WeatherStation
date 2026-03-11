@@ -349,12 +349,16 @@ def draw_display(screen, state):
 # City selection screen
 # ═══════════════════════════════════════════════════════════════════
 
-def draw_city_select(screen, cities, cursor):
+def draw_city_select(screen, cities, cursor, temps=None, conditions=None):
     """Render the city-selection list.
 
     Args:
-        cities: sequence of (name, lat, lon, utc_offset_h) tuples
-        cursor: index of currently highlighted city
+        cities:     sequence of (name, lat, lon, utc_offset_h) tuples
+        cursor:     index of currently highlighted city
+        temps:      optional list of temperature strings (one per city, or None
+                    if not yet fetched), displayed right-aligned in each row
+        conditions: optional list of condition strings (e.g. "Rain"), displayed
+                    just to the left of the temperature
     """
     ROW_H = (config.H - config.TOP_H) // len(cities)  # 49 px for 5 cities
 
@@ -382,6 +386,14 @@ def draw_city_select(screen, cities, cursor):
         tx = (config.W - len(row_text) * 8) // 2
         ty = row_y + (ROW_H - 8) // 2
         screen.text(row_text, tx, ty, text_color)
+
+        if temps is not None and i < len(temps) and temps[i] is not None:
+            temp_str = temps[i]
+            temp_x = config.W - len(temp_str) * 8 - 10
+            screen.text(temp_str, temp_x, ty, text_color)
+            if conditions is not None and i < len(conditions) and conditions[i] is not None:
+                cond_str = conditions[i]
+                screen.text(cond_str, temp_x - len(cond_str) * 8 - 8, ty, text_color)
 
 
 def draw_error(screen, msg):
