@@ -5,6 +5,8 @@
 import time
 from machine import Pin
 
+_ROT_DEBOUNCE_MS = 500   # ignore encoder edges within this window
+
 import config
 import model
 import viewmodel
@@ -19,9 +21,11 @@ _active_city = 4          # default: Rockville, MD (index 4 in CITIES)
 _cursor      = 4          # highlighted city in select screen
 
 # ── ISR flags ────────────────────────────────────────────────────────
-_refresh_flag = True      # True at startup so city temps fetch immediately
-_rot_delta    = 0         # accumulated rotation ticks
-_rot_click    = False     # True when SW button pressed
+_refresh_flag  = True      # True at startup so city temps fetch immediately
+_rot_delta     = 0         # accumulated rotation ticks
+_rot_click     = False     # True when SW button pressed
+_last_rot_ms   = 0         # debounce timestamp for rotation
+_last_click_ms = 0         # debounce timestamp for SW button
 
 
 def _menu_irq(_):
@@ -30,18 +34,27 @@ def _menu_irq(_):
 
 
 def _rot_up_irq(pin):
-    global _rot_delta
-    _rot_delta -= 1
+    global _rot_delta, _last_rot_ms
+    now = time.ticks_ms()
+    if time.ticks_diff(now, _last_rot_ms) >= _ROT_DEBOUNCE_MS:
+        _rot_delta -= 1
+        _last_rot_ms = now
 
 
 def _rot_down_irq(pin):
-    global _rot_delta
-    _rot_delta += 1
+    global _rot_delta, _last_rot_ms
+    now = time.ticks_ms()
+    if time.ticks_diff(now, _last_rot_ms) >= _ROT_DEBOUNCE_MS:
+        _rot_delta += 1
+        _last_rot_ms = now
 
 
 def _rot_press_irq(pin):
-    global _rot_click
-    _rot_click = True
+    global _rot_click, _last_click_ms
+    now = time.ticks_ms()
+    if time.ticks_diff(now, _last_click_ms) >= _ROT_DEBOUNCE_MS:
+        _rot_click = True
+        _last_click_ms = now
 
 
 def main():
