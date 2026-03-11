@@ -14,7 +14,7 @@ import view
 STATE_WEATHER     = 0
 STATE_CITY_SELECT = 1
 
-_app_state   = STATE_WEATHER
+_app_state   = STATE_CITY_SELECT
 _active_city = 4          # default: Rockville, MD (index 4 in CITIES)
 _cursor      = 4          # highlighted city in select screen
 
@@ -61,8 +61,10 @@ def main():
 
     screen = view.init_screen()
     raw    = None
-    # force an immediate fetch on first iteration
-    last_ms = time.ticks_add(time.ticks_ms(), -(config.REFRESH_SEC * 1000))
+    last_ms = time.ticks_ms()
+
+    view.draw_city_select(screen, config.CITIES, _cursor)
+    screen.show(mode=0)
 
     while True:
         time.sleep(1)
