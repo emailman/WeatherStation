@@ -17,8 +17,8 @@ STATE_WEATHER     = 0
 STATE_CITY_SELECT = 1
 
 _app_state   = STATE_CITY_SELECT
-_active_city = 4          # default: Rockville, MD (index 4 in CITIES)
-_cursor      = 4          # highlighted city in select screen
+_active_city = 0          # default: Rockville, MD (index 0 in CITIES)
+_cursor      = 0          # highlighted city in select screen
 
 # ── ISR flags ────────────────────────────────────────────────────────
 _refresh_flag  = True      # True at startup so city temps fetch immediately

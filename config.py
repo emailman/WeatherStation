@@ -18,11 +18,11 @@ ROT_CLICK = 5
 
 # City list — each entry: (name, lat, lon, utc_offset_h)
 CITIES = [
-    ("New York, NY",    40.71,  -74.01,  -4),
-    ("Chicago, IL",     41.88,  -87.63,  -5),
-    ("Los Angeles, CA", 34.05, -118.24,  -7),
-    ("Houston, TX",     29.76,  -95.37,  -5),
-    ("Rockville, MD",   39.08,  -77.16,  -4),
+    ("Rockville, MD",    39.08,  -77.16,  -4),
+    ("Missoula, MT",     46.87, -113.99,  -6),
+    ("San Francisco, CA",37.77, -122.42,  -7),
+    ("San Diego, CA",    32.72, -117.16,  -7),
+    ("New York, NY",     40.71,  -74.01,  -4),
 ]
 # ────────────────────────────────────────────────────────────────────
 
