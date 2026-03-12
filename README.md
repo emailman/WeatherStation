@@ -13,7 +13,7 @@ no API key required.
 
 ```
 +-----------------------------------------------------------------------------+
-|  Rockville, MD          08:32:15 AM  03/10/2026               Bat:90%      |
+|    Rockville, MD            08:32:15 AM             03/10/2026              |
 +------------------------------+------------------+---------------------------+
 |                              |                  |         N                 |
 |         [sun icon]           |   Humidity       |       W (+) E             |
@@ -31,7 +31,7 @@ no API key required.
 - **Left panel** — WMO weather icon, condition text (e.g. "Clear"), and large 7-segment temperature (°F)
 - **Centre panel** — humidity (%) and barometric pressure (inHg)
 - **Right panel** — compass rose showing wind direction, wind speed (mph), and wind gust (mph)
-- **Top bar** — location, local time, date, battery stub
+- **Top bar** — location (left), local time (centre), date (right); each centred in its third of the bar
 - **Bottom bar** — sunrise and sunset times
 
 ### City selection screen

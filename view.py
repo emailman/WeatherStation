@@ -217,11 +217,9 @@ def draw_top_bar(screen, state):
     date_str = state["date_str"]
     location = state["location"]
 
-    screen.text(location, 4, y, BLACK)
-    time_x = config.W // 2 - len(time_str) * 4
-    screen.text(time_str, time_x, y, BLACK)
-    screen.text(date_str, time_x + len(time_str) * 8 + 8, y, BLACK)
-    screen.text("Bat:90%", config.W - 60, y, BLACK)
+    screen.text(location, config.W // 6 - len(location) * 4, y, BLACK)
+    screen.text(time_str, config.W // 2 - len(time_str) * 4, y, BLACK)
+    screen.text(date_str, config.W * 5 // 6 - len(date_str) * 4, y, BLACK)
     screen.hline(0, config.TOP_H - 1, config.W, BLACK)
 
 
