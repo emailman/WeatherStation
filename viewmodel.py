@@ -48,6 +48,11 @@ def _format_wind_speed(mph):
     return "{:.1f} mph".format(mph)
 
 
+def _format_wind_gust(mph):
+    """Return wind gust string, e.g. '18.5 mph'."""
+    return "{:.1f} mph".format(mph)
+
+
 def _format_time(utc_offset_h):
     """Return (time_str, date_str) shifted by utc_offset_h hours.
 
@@ -97,6 +102,7 @@ def build_display_state(raw, city_name=None, utc_offset_h=None):
         "humidity":       raw["humidity"],
         "pressure_str":   _format_pressure(raw["pressure"]),
         "wind_speed_str": _format_wind_speed(raw["wind_speed"]),
+        "wind_gust_str":  _format_wind_gust(raw["wind_gust"]),
         "wind_dir":       raw["wind_dir"],
         "weather_code":   raw["code"],
         "sunrise":        raw["sunrise"],

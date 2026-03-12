@@ -325,6 +325,16 @@ def draw_right_panel(screen, state):
     draw_compass(screen, compass_cx, compass_cy, compass_r,
                  state["wind_dir"], state["wind_speed_str"])
 
+    # Wind Gust label + value (blank line gap after wind speed text)
+    gust_label = "Wind Gust"
+    screen.text(gust_label,
+                compass_cx - len(gust_label) * 4,
+                compass_cy + compass_r + 34, BLACK)
+    gust_str = state["wind_gust_str"]
+    screen.text(gust_str,
+                compass_cx - len(gust_str) * 4,
+                compass_cy + compass_r + 44, BLACK)
+
 
 # ═══════════════════════════════════════════════════════════════════
 # Full display draw

@@ -50,7 +50,7 @@ def fetch_weather(lat, lon, utc_offset_h=None):
         "http://api.open-meteo.com/v1/forecast"
         "?latitude={}&longitude={}"
         "&current=temperature_2m,relative_humidity_2m,surface_pressure,"
-        "wind_speed_10m,wind_direction_10m,weather_code"
+        "wind_speed_10m,wind_direction_10m,wind_gusts_10m,weather_code"
         "&daily=sunrise,sunset"
         "&timezone=auto&forecast_days=1"
     ).format(lat, lon)
@@ -65,15 +65,17 @@ def fetch_weather(lat, lon, utc_offset_h=None):
     def hhmm(iso):  # "2025-08-23T05:44" → "05:44"
         return iso[11:16] if len(iso) > 10 else iso[-5:]
 
-    temp_c    = c.get("temperature_2m",        0.0)
-    speed_kmh = c.get("wind_speed_10m",        0.0)
-    press_hpa = c.get("surface_pressure",      0.0)
+    temp_c     = c.get("temperature_2m",        0.0)
+    speed_kmh  = c.get("wind_speed_10m",        0.0)
+    gusts_kmh  = c.get("wind_gusts_10m",        0.0)
+    press_hpa  = c.get("surface_pressure",      0.0)
 
     return {
         "temp":       temp_c * 9 / 5 + 32,
         "humidity":   int(c.get("relative_humidity_2m", 0)),
         "pressure":   round(press_hpa * 0.02953, 2),
         "wind_speed": speed_kmh * 0.621371,
+        "wind_gust":  gusts_kmh * 0.621371,
         "wind_dir":   int(c.get("wind_direction_10m",   0)),
         "code":       int(c.get("weather_code",         0)),
         "sunrise":    hhmm(d["sunrise"][0]),
