@@ -252,7 +252,7 @@ def draw_bottom_bar(screen, state):
 def draw_left_panel(screen, state):
     panel_h = config.BOT_Y - config.TOP_H  # 220 px
     icon_cx = config.COL1_X // 2  # 200
-    icon_cy = config.TOP_H + panel_h // 3  # ~98
+    icon_cy = config.TOP_H + panel_h // 3 - 20  # ~78
 
     draw_weather_icon(screen, state["weather_code"], icon_cx, icon_cy, 45)
 
@@ -263,7 +263,11 @@ def draw_left_panel(screen, state):
     n_digits = len([c for c in temp_str if c.isdigit()])
     approx_w = n_digits * digit_w + (seg_h // 4) + digit_w
     tx = max(4, icon_cx - approx_w // 2)
-    ty = icon_cy + 50
+    ty = icon_cy + 62
+
+    # Condition text centred halfway between icon and temperature
+    cond = state["condition_str"]
+    screen.text(cond, icon_cx - len(cond) * 4, (icon_cy + ty) // 2 - 4, BLACK)
 
     draw_large_number(screen, temp_str, tx, ty, seg_h, BLACK)
 

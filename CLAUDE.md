@@ -31,6 +31,7 @@ main.py        button/encoder ISRs + polling loop, wires the layers
     "humidity":   int,     # %
     "pressure":   float,   # inHg
     "wind_speed": float,   # mph (converted from km/h — Open-Meteo default)
+    "wind_gust":  float,   # mph (converted from km/h)
     "wind_dir":   int,     # degrees, 0=N clockwise
     "code":       int,     # WMO weather code
     "sunrise":    str,     # "HH:MM"
@@ -45,8 +46,10 @@ main.py        button/encoder ISRs + polling loop, wires the layers
     "humidity":       int,
     "pressure_str":   str,   # e.g. "29.92"
     "wind_speed_str": str,   # e.g. "12.3 mph"
+    "wind_gust_str":  str,   # e.g. "18.5 mph"
     "wind_dir":       int,
     "weather_code":   int,
+    "condition_str":  str,   # e.g. "Clear", "Rain" — from wmo_condition(); used in left panel
     "sunrise":        str,
     "sunset":         str,
     "time_str":       str,   # e.g. "08:32:15 AM"
@@ -114,7 +117,7 @@ COL2_X=600 — centre/right divider
 
 Panel centres derived from these:
 - Left panel icon: `COL1_X // 2` = 200
-- Compass: `(COL2_X + W) // 2` = 696, `(TOP_H + BOT_Y) // 2` = 135
+- Compass: `(COL2_X + W) // 2` = 696, `(TOP_H + BOT_Y) // 2 - 35` = 100
 
 ## WMO weather codes handled
 
@@ -132,12 +135,13 @@ Panel centres derived from these:
 
 **Change timezone:** Edit `UTC_OFFSET_H` in `config.py`.
 
-**Change units:** Edit `_format_temperature()` or `_format_wind_speed()` in
-`viewmodel.py`. Also update the unit suffix strings in `view.draw_center_panel()`
-for pressure.
+**Change units:** Edit `_format_temperature()`, `_format_wind_speed()`, or
+`_format_wind_gust()` in `viewmodel.py`. Also update the unit suffix strings in
+`view.draw_center_panel()` for pressure.
 
 **Add a new WMO code:** Add an `elif` branch in `view.draw_weather_icon()` and
-a matching branch in `viewmodel.wmo_condition()`.
+a matching branch in `viewmodel.wmo_condition()`. The condition string is shown
+both in the left panel and on the city-select screen.
 
 **Add a city:** Append a `(name, lat, lon, utc_offset_h)` tuple to `CITIES` in `config.py`.
 
