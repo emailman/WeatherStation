@@ -172,7 +172,7 @@ def draw_weather_icon(screen, code, cx, cy, size):
 # Compass rose
 # ═══════════════════════════════════════════════════════════════════
 
-def draw_compass(screen, cx, cy, radius, wind_deg, speed_str):
+def draw_compass(screen, cx, cy, radius, wind_deg):
     r = radius
     screen.ellipse(cx, cy, r, r, BLACK)
 
@@ -205,10 +205,6 @@ def draw_compass(screen, cx, cy, radius, wind_deg, speed_str):
 
     # Centre dot
     screen.ellipse(cx, cy, 3, 3, BLACK, True)
-
-    # Wind speed text centred below compass
-    tw = len(speed_str) * 8
-    screen.text(speed_str, cx - tw // 2, cy + r + 14, BLACK)
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -320,20 +316,29 @@ def draw_center_panel(screen, state):
 
 def draw_right_panel(screen, state):
     compass_cx = (config.COL2_X + config.W) // 2  # 696
-    compass_cy = (config.TOP_H + config.BOT_Y) // 2  # 135
+    compass_cy = (config.TOP_H + config.BOT_Y) // 2 - 35  # 100
     compass_r = 52
     draw_compass(screen, compass_cx, compass_cy, compass_r,
-                 state["wind_dir"], state["wind_speed_str"])
+                 state["wind_dir"])
 
-    # Wind Gust label + value (blank line gap after wind speed text)
+    # "Wind Speed" label + value, then blank line, then "Wind Gust" label + value
+    base_y = compass_cy + compass_r + 19
+    spd_label = "Wind Speed"
+    screen.text(spd_label,
+                compass_cx - len(spd_label) * 4,
+                base_y, BLACK)
+    spd_str = state["wind_speed_str"]
+    screen.text(spd_str,
+                compass_cx - len(spd_str) * 4,
+                base_y + 10, BLACK)
     gust_label = "Wind Gust"
     screen.text(gust_label,
                 compass_cx - len(gust_label) * 4,
-                compass_cy + compass_r + 34, BLACK)
+                base_y + 28, BLACK)
     gust_str = state["wind_gust_str"]
     screen.text(gust_str,
                 compass_cx - len(gust_str) * 4,
-                compass_cy + compass_r + 44, BLACK)
+                base_y + 38, BLACK)
 
 
 # ═══════════════════════════════════════════════════════════════════
