@@ -438,7 +438,8 @@ def draw_forecast(screen, state):
         _text(d["condition_str"],    85)
         _text("Hi:" + d["high_str"], 125)
         _text("Lo:" + d["low_str"],  160)
-        _text(d["precip_str"],       195)
+        _text("Precip Chance",        183)
+        _text(d["precip_str"],       198)
 
     screen.show(mode=0)
 

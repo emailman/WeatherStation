@@ -70,11 +70,13 @@ Press the bottom button again to return to the weather display for that city.
 |        |        |        |        |        |        |
 | Hi:72F | Hi:65F | Hi:60F | Hi:70F | Hi:55F | Hi:58F |
 | Lo:55F | Lo:50F | Lo:48F | Lo:52F | Lo:40F | Lo:44F |
+|Precip  |Precip  |Precip  |Precip  |Precip  |Precip  |
+| Chance | Chance | Chance | Chance | Chance | Chance |
 |  30%   |  80%   |  40%   |  10%   |  60%   |  20%   |
 +--------+--------+--------+--------+--------+--------+
 ```
 
-Each column shows: day name, mm/dd date, condition text, high/low temps (°F), and precipitation probability (%).
+Each column shows: day name, mm/dd date, condition text, high/low temps (°F), "Precip Chance" label, and precipitation probability (%).
 The top bar shows the city name, current time, and date (same as other screens).
 
 ## Hardware
