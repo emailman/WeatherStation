@@ -81,3 +81,50 @@ def fetch_weather(lat, lon, utc_offset_h=None):
         "sunrise":    hhmm(d["sunrise"][0]),
         "sunset":     hhmm(d["sunset"][0]),
     }
+
+
+_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
+
+def fetch_forecast(lat, lon):
+    """Fetch 5-day daily forecast from Open-Meteo.
+
+    Returns a list of 5 dicts:
+        day         str    e.g. "Mon"
+        high        float  °F
+        low         float  °F
+        precip_pct  int    %
+        code        int    WMO weather code
+    """
+    url = (
+        "http://api.open-meteo.com/v1/forecast"
+        "?latitude={}&longitude={}"
+        "&daily=temperature_2m_max,temperature_2m_min,"
+        "weather_code,precipitation_probability_max"
+        "&forecast_days=6&timezone=auto"
+    ).format(lat, lon)
+    print("GET", url)
+    resp = urequests.get(url)
+    raw  = resp.json()
+    resp.close()
+
+    d = raw["daily"]
+    result = []
+    for i in range(6):
+        date_str = d["time"][i]          # "2026-03-12"
+        year  = int(date_str[0:4])
+        month = int(date_str[5:7])
+        mday  = int(date_str[8:10])
+        weekday = time.localtime(time.mktime((year, month, mday, 0, 0, 0, 0, 0)))[6]
+        high_c = d["temperature_2m_max"][i]
+        low_c  = d["temperature_2m_min"][i]
+        precip = d["precipitation_probability_max"][i]
+        result.append({
+            "day":        _DAYS[weekday],
+            "date":       "{:02d}/{:02d}".format(month, mday),
+            "high":       high_c * 9 / 5 + 32,
+            "low":        low_c  * 9 / 5 + 32,
+            "precip_pct": int(precip) if precip is not None else 0,
+            "code":       int(d["weather_code"][i]),
+        })
+    return result

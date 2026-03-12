@@ -55,13 +55,36 @@ Each row shows the city name, current weather condition, and temperature (°F).
 The highlighted row (cursor) is shown in inverse video.
 Data refreshes on the same 10-minute schedule as the weather display.
 
+### 6-day forecast screen
+
+Press the bottom button (GPIO 1) from either the weather display or the city
+selection screen to view the 6-day forecast for the active/highlighted city.
+Press the bottom button again to return to the weather display for that city.
+
+```
++--------+--------+--------+--------+--------+--------+
+|  Mon   |  Tue   |  Wed   |  Thu   |  Fri   |  Sat   |
+| 03/10  | 03/11  | 03/12  | 03/13  | 03/14  | 03/15  |
+|        |        |        |        |        |        |
+| Clear  |  Rain  | Cloudy | Clear  |  Snow  | Cloudy |
+|        |        |        |        |        |        |
+| Hi:72F | Hi:65F | Hi:60F | Hi:70F | Hi:55F | Hi:58F |
+| Lo:55F | Lo:50F | Lo:48F | Lo:52F | Lo:40F | Lo:44F |
+|  30%   |  80%   |  40%   |  10%   |  60%   |  20%   |
++--------+--------+--------+--------+--------+--------+
+```
+
+Each column shows: day name, mm/dd date, condition text, high/low temps (°F), and precipitation probability (%).
+The top bar shows the city name, current time, and date (same as other screens).
+
 ## Hardware
 
 | Item | Detail |
-|------|--------|
+|---|---|
 | Display | Elecrow CrowPanel 5.79" e-paper, 792 × 272 px |
 | MCU | ESP32 (or compatible MicroPython board) |
-| Button | MENU button on GPIO 2 (active-low, pull-up); triggers an immediate refresh |
+| MENU button | GPIO 2 (active-low, pull-up); triggers an immediate refresh |
+| Bottom button | GPIO 1 (active-low, pull-up); opens/closes the 6-day forecast screen |
 | Rotary encoder | Up/Down/Click on GPIOs defined in `config.py`; navigates city selection |
 
 ## File overview

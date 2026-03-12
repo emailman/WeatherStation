@@ -71,6 +71,43 @@ def _format_time(utc_offset_h):
     return time_str, date_str
 
 
+def build_forecast_state(forecast_raw, city_name=None, utc_offset_h=None):
+    """Convert a list of daily forecast dicts into a display-state dict for draw_forecast().
+
+    Args:
+        forecast_raw:  list returned by model.fetch_forecast()
+        city_name:     display name for the location
+        utc_offset_h:  UTC offset in hours for time formatting
+
+    Returns:
+        location  str
+        time_str  str
+        date_str  str
+        days      list of dicts with keys: day, high_str, low_str, precip_str, condition_str
+    """
+    if city_name is None:
+        city_name = config.LOCATION_NAME
+    if utc_offset_h is None:
+        utc_offset_h = config.UTC_OFFSET_H
+    time_str, date_str = _format_time(utc_offset_h)
+    days = []
+    for d in forecast_raw:
+        days.append({
+            "day":           d["day"],
+            "date":          d["date"],
+            "high_str":      str(int(round(d["high"]))) + "F",
+            "low_str":       str(int(round(d["low"])))  + "F",
+            "precip_str":    str(d["precip_pct"]) + "%",
+            "condition_str": wmo_condition(d["code"]),
+        })
+    return {
+        "location": city_name,
+        "time_str": time_str,
+        "date_str": date_str,
+        "days":     days,
+    }
+
+
 def build_display_state(raw, city_name=None, utc_offset_h=None):
     """Convert a raw model dict into a display-state dict consumed by the view.
 

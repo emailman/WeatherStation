@@ -67,12 +67,52 @@ main.py        button/encoder ISRs + polling loop, wires the layers
 - `conditions` — list of condition strings from `wmo_condition`, one per city (or `None`)
 - Both are shown right-aligned in each row: `[condition]  [temp]`
 
+### model.fetch_forecast(lat, lon) → list of 6 dicts
+```python
+[
+    {
+        "day":        str,   # e.g. "Mon"
+        "date":       str,   # e.g. "03/12"
+        "high":       float, # °F
+        "low":        float, # °F
+        "precip_pct": int,   # %
+        "code":       int,   # WMO weather code
+    },
+    ...  # 6 entries total
+]
+```
+
+### viewmodel.build_forecast_state(forecast_raw, city_name, utc_offset_h) → display-state dict
+```python
+{
+    "location": str,
+    "time_str": str,
+    "date_str": str,
+    "days": [
+        {"day", "date", "high_str", "low_str", "precip_str", "condition_str"},
+        ...  # 6 entries
+    ]
+}
+```
+`location`/`time_str`/`date_str` keys allow `draw_top_bar()` to be reused unchanged.
+
+### view.draw_forecast(screen, state)
+6-column layout (132 px per column). Dividers at x=132, 264, 396, 528, 660.
+Each column shows: day name, mm/dd date, condition, Hi:NNF, Lo:NNF, precip%.
+
 ## App states (main.py)
 
 ```
-STATE_WEATHER     = 0   — weather display; rotary click → city select
-STATE_CITY_SELECT = 1   — city list; rotary click → confirm; rotate → move cursor
+STATE_WEATHER     = 0   — weather display; rotary click → city select; bottom button → forecast
+STATE_CITY_SELECT = 1   — city list; rotary click → confirm; rotate → move cursor; bottom button → forecast
+STATE_FORECAST    = 2   — 6-day forecast; bottom button → weather display (for forecast city)
 ```
+
+Navigation:
+- STATE_WEATHER → bottom button → STATE_FORECAST (forecast for active city)
+- STATE_CITY_SELECT → bottom button → STATE_FORECAST (forecast for cursor city)
+- STATE_FORECAST → bottom button → STATE_WEATHER (sets active city = forecast city)
+- STATE_WEATHER ↔ STATE_CITY_SELECT via rotary click
 
 City temps and conditions are cached in `_city_temps` / `_city_conditions` lists and
 refreshed on the same `REFRESH_SEC` timer as the weather display. `_refresh_flag = True`

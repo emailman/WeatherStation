@@ -15,22 +15,35 @@ import view
 # ── App states ───────────────────────────────────────────────────────
 STATE_WEATHER     = 0
 STATE_CITY_SELECT = 1
+STATE_FORECAST    = 2
 
-_app_state   = STATE_CITY_SELECT
-_active_city = 0          # default: Rockville, MD (index 0 in CITIES)
-_cursor      = 0          # highlighted city in select screen
+_app_state     = STATE_CITY_SELECT
+_active_city   = 0          # default: Rockville, MD (index 0 in CITIES)
+_cursor        = 0          # highlighted city in select screen
+_forecast_city = 0          # which city the forecast is for
+_forecast_raw  = None       # cached forecast list
 
 # ── ISR flags ────────────────────────────────────────────────────────
-_refresh_flag  = True      # True at startup so city temps fetch immediately
-_rot_delta     = 0         # accumulated rotation ticks
-_rot_click     = False     # True when SW button pressed
-_last_rot_ms   = 0         # debounce timestamp for rotation
-_last_click_ms = 0         # debounce timestamp for SW button
+_refresh_flag   = True      # True at startup so city temps fetch immediately
+_rot_delta      = 0         # accumulated rotation ticks
+_rot_click      = False     # True when SW button pressed
+_last_rot_ms    = 0         # debounce timestamp for rotation
+_last_click_ms  = 0         # debounce timestamp for SW button
+_bottom_flag    = False     # set by GPIO 1 ISR
+_last_bottom_ms = 0         # debounce timestamp for bottom button
 
 
 def _menu_irq(_):
     global _refresh_flag
     _refresh_flag = True
+
+
+def _bottom_irq(pin):
+    global _bottom_flag, _last_bottom_ms
+    now = time.ticks_ms()
+    if time.ticks_diff(now, _last_bottom_ms) >= _ROT_DEBOUNCE_MS:
+        _bottom_flag = True
+        _last_bottom_ms = now
 
 
 def _rot_up_irq(pin):
@@ -58,11 +71,13 @@ def _rot_press_irq(pin):
 
 
 def main():
-    global _app_state, _active_city, _cursor
-    global _refresh_flag, _rot_delta, _rot_click
+    global _app_state, _active_city, _cursor, _forecast_city, _forecast_raw
+    global _refresh_flag, _rot_delta, _rot_click, _bottom_flag
 
-    menu_btn = Pin(2, Pin.IN, Pin.PULL_UP)
-    menu_btn.irq(trigger=Pin.IRQ_FALLING, handler=_menu_irq)
+    menu_btn   = Pin(2, Pin.IN, Pin.PULL_UP)
+    bottom_btn = Pin(1, Pin.IN, Pin.PULL_UP)
+    menu_btn.irq(trigger=Pin.IRQ_FALLING,   handler=_menu_irq)
+    bottom_btn.irq(trigger=Pin.IRQ_FALLING, handler=_bottom_irq)
 
     rot_up.irq(trigger=Pin.IRQ_FALLING,    handler=_rot_up_irq)
     rot_down.irq(trigger=Pin.IRQ_FALLING,  handler=_rot_down_irq)
@@ -93,6 +108,13 @@ def main():
                 _rot_delta = 0
                 changed = True
 
+            if _bottom_flag:
+                _bottom_flag = False
+                _forecast_city = _cursor
+                _app_state = STATE_FORECAST
+                _refresh_flag = True
+                continue
+
             if _rot_click:
                 _rot_click = False
                 _active_city = _cursor
@@ -119,7 +141,42 @@ def main():
                 screen.show(mode=0)
             continue
 
+        # ── Forecast mode ─────────────────────────────────────────────
+        if _app_state == STATE_FORECAST:
+            if _bottom_flag:
+                _bottom_flag = False
+                _active_city = _forecast_city
+                _app_state = STATE_WEATHER
+                _refresh_flag = True
+                continue
+
+            elapsed = time.ticks_diff(time.ticks_ms(), last_ms) // 1000
+            if elapsed >= config.REFRESH_SEC or _refresh_flag:
+                _refresh_flag = False
+                last_ms = time.ticks_ms()
+                name, lat, lon, utc_h = config.CITIES[_forecast_city]
+                print("Fetching forecast for", name, "...")
+                try:
+                    _forecast_raw = model.fetch_forecast(lat, lon)
+                except Exception as e:
+                    print("Forecast fetch error:", e)
+                if _forecast_raw is not None:
+                    try:
+                        fstate = viewmodel.build_forecast_state(_forecast_raw, name, utc_h)
+                        view.draw_forecast(screen, fstate)
+                    except Exception as e:
+                        print("Forecast draw error:", e)
+                        view.draw_error(screen, "Forecast: " + str(e))
+            continue
+
         # ── Weather display mode ──────────────────────────────────────
+        if _bottom_flag:
+            _bottom_flag = False
+            _forecast_city = _active_city
+            _app_state = STATE_FORECAST
+            _refresh_flag = True
+            continue
+
         if _rot_click:
             _rot_click = False
             _cursor = _active_city     # start selection at current city

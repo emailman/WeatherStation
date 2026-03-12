@@ -415,6 +415,34 @@ def draw_city_select(screen, cities, cursor, temps=None, conditions=None):
                 screen.text(cond_str, temp_x - len(cond_str) * 8 - 8, ty, text_color)
 
 
+def draw_forecast(screen, state):
+    """Render the 5-day forecast screen."""
+    screen.fill(WHITE)
+    draw_top_bar(screen, state)
+    screen.hline(0, config.BOT_Y, config.W, BLACK)
+
+    # 5 vertical dividers splitting 792px into 6 equal columns (132px each)
+    for x in (132, 264, 396, 528, 660):
+        screen.vline(x, config.TOP_H, config.BOT_Y - config.TOP_H, BLACK)
+
+    days = state["days"]
+    for i, d in enumerate(days):
+        cx = i * 132 + 66  # column centre
+
+        def _text(txt, y):
+            tx = cx - len(txt) * 4
+            screen.text(txt, tx, y, BLACK)
+
+        _text(d["day"],              35)
+        _text(d["date"],             50)
+        _text(d["condition_str"],    85)
+        _text("Hi:" + d["high_str"], 125)
+        _text("Lo:" + d["low_str"],  160)
+        _text(d["precip_str"],       195)
+
+    screen.show(mode=0)
+
+
 def draw_error(screen, msg):
     screen.fill(WHITE)
     screen.text("Weather fetch error:", 10, 90, BLACK)
