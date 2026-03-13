@@ -252,8 +252,8 @@ def draw_left_panel(screen, state):
 
     # Even vertical distribution: 4 blocks (76+8+50+21=155 px), 5 gaps of 13 px
     icon_cy        = config.TOP_H + 13 + 38       # 76  (icon radius=38)
-    cond_y         = icon_cy + 38 + 13             # 127
-    temp_y         = cond_y + 8 + 13               # 148
+    cond_y         = icon_cy + 38 + 13 - 10        # 117
+    temp_y         = cond_y + 8 + 13               # 138
     precip_label_y = temp_y + 50 + 13              # 211
     precip_val_y   = precip_label_y + 8 + 5        # 224
 

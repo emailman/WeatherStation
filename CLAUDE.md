@@ -36,6 +36,7 @@ main.py        button/encoder ISRs + polling loop, wires the layers
     "code":       int,     # WMO weather code
     "sunrise":    str,     # "HH:MM"
     "sunset":     str,     # "HH:MM"
+    "precip_pct": int,     # today's precipitation probability max (%)
 }
 ```
 
@@ -50,6 +51,7 @@ main.py        button/encoder ISRs + polling loop, wires the layers
     "wind_dir":       int,
     "weather_code":   int,
     "condition_str":  str,   # e.g. "Clear", "Rain" — from wmo_condition(); used in left panel
+    "precip_pct_str": str,   # e.g. "30%" — today's precipitation probability max
     "sunrise":        str,
     "sunset":         str,
     "time_str":       str,   # e.g. "08:32:15 AM"
@@ -151,13 +153,13 @@ Do NOT use `'o'` in strings passed to `screen.text()` — use plain text helpers
 W=792, H=272
 TOP_H=25   — top bar height, hline at y=24
 BOT_Y=245  — bottom bar start, hline at y=245
-COL1_X=400 — left/centre divider
-COL2_X=600 — centre/right divider
+COL1_X=396 — left/centre divider (50% of W)
+COL2_X=594 — centre/right divider (75% of W)
 ```
 
 Panel centres derived from these:
-- Left panel icon: `COL1_X // 2` = 200
-- Compass: `(COL2_X + W) // 2` = 696, `(TOP_H + BOT_Y) // 2 - 35` = 100
+- Left panel icon: `COL1_X // 2` = 198
+- Compass: `(COL2_X + W) // 2` = 693, `(TOP_H + BOT_Y) // 2 - 35` = 100
 
 ## WMO weather codes handled
 
