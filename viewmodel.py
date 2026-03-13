@@ -143,6 +143,7 @@ def build_display_state(raw, city_name=None, utc_offset_h=None):
         "wind_dir":       raw["wind_dir"],
         "weather_code":   raw["code"],
         "condition_str":  wmo_condition(raw["code"]),
+        "precip_pct_str": str(raw["precip_pct"]) + "%",
         "sunrise":        raw["sunrise"],
         "sunset":         raw["sunset"],
         "time_str":       time_str,

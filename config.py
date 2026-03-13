@@ -33,5 +33,5 @@ H = 272
 # Layout breakpoints
 TOP_H  = 25   # top bar height; separator hline drawn at y=24
 BOT_Y  = 245  # bottom bar start; separator hline drawn here
-COL1_X = 400  # left ↔ centre panel divider
-COL2_X = 600  # centre ↔ right panel divider
+COL1_X = 396  # left ↔ centre panel divider (50% of 792)
+COL2_X = 594  # centre ↔ right panel divider (75% of 792)

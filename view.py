@@ -248,26 +248,32 @@ def draw_bottom_bar(screen, state):
 # ═══════════════════════════════════════════════════════════════════
 
 def draw_left_panel(screen, state):
-    panel_h = config.BOT_Y - config.TOP_H  # 220 px
-    icon_cx = config.COL1_X // 2  # 200
-    icon_cy = config.TOP_H + panel_h // 3 - 20  # ~78
+    icon_cx = config.COL1_X // 2  # 198
 
-    draw_weather_icon(screen, state["weather_code"], icon_cx, icon_cy, 45)
+    # Even vertical distribution: 4 blocks (76+8+50+21=155 px), 5 gaps of 13 px
+    icon_cy        = config.TOP_H + 13 + 38       # 76  (icon radius=38)
+    cond_y         = icon_cy + 38 + 13             # 127
+    temp_y         = cond_y + 8 + 13               # 148
+    precip_label_y = temp_y + 50 + 13              # 211
+    precip_val_y   = precip_label_y + 8 + 5        # 224
 
-    seg_h = 55
+    draw_weather_icon(screen, state["weather_code"], icon_cx, icon_cy, 38)
+
+    cond = state["condition_str"]
+    screen.text(cond, icon_cx - len(cond) * 4, cond_y, BLACK)
+
+    seg_h = 50
     temp_str = state["temp_str"]
-
     digit_w = seg_h * 6 // 10 + max(2, seg_h // 10)
     n_digits = len([c for c in temp_str if c.isdigit()])
     approx_w = n_digits * digit_w + (seg_h // 4) + digit_w
     tx = max(4, icon_cx - approx_w // 2)
-    ty = icon_cy + 62
+    draw_large_number(screen, temp_str, tx, temp_y, seg_h, BLACK)
 
-    # Condition text centred halfway between icon and temperature
-    cond = state["condition_str"]
-    screen.text(cond, icon_cx - len(cond) * 4, (icon_cy + ty) // 2 - 4, BLACK)
-
-    draw_large_number(screen, temp_str, tx, ty, seg_h, BLACK)
+    label = "Chance of precip"
+    screen.text(label, icon_cx - len(label) * 4, precip_label_y, BLACK)
+    precip_str = state["precip_pct_str"]
+    screen.text(precip_str, icon_cx - len(precip_str) * 4, precip_val_y, BLACK)
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -275,41 +281,35 @@ def draw_left_panel(screen, state):
 # ═══════════════════════════════════════════════════════════════════
 
 def draw_center_panel(screen, state):
-    panel_cx = (config.COL1_X + config.COL2_X) // 2 - 25  # 475
+    panel_cx = (config.COL1_X + config.COL2_X) // 2 - 25  # 470
     seg_h = 32
+    mid_y = (config.TOP_H + config.BOT_Y) // 2  # 135
+
+    # Each half (110 px) centres its block (label 8 + gap 5 + value 32 = 45 px)
+    # leaving 32 px margins top and bottom within each half.
 
     # ── Humidity (upper half) ──
+    hy_y = config.TOP_H + 32   # label top: 57
+    hum_y = hy_y + 13          # value top: 70  (8px label + 5px gap)
     hy_label = "Humidity"
-    screen.text(hy_label,
-                panel_cx - len(hy_label) * 4,
-                config.TOP_H + 10, BLACK)
-    screen.ellipse(config.COL1_X + 16, config.TOP_H + 42, 7, 10, BLACK)
-
+    screen.text(hy_label, panel_cx - len(hy_label) * 4, hy_y, BLACK)
     hum_str = str(state["humidity"])
-    hum_w = draw_large_number(screen, hum_str,
-                              panel_cx - 18, config.TOP_H + 28,
-                              seg_h, BLACK)
-    screen.text("%", panel_cx - 18 + hum_w + 2,
-                config.TOP_H + 28 + seg_h - 8, BLACK)
+    hum_w = draw_large_number(screen, hum_str, panel_cx - 18, hum_y, seg_h, BLACK)
+    screen.text("%", panel_cx - 18 + hum_w + 2, hum_y + seg_h - 8, BLACK)
+    screen.ellipse(config.COL1_X + 16, hum_y + 11, 7, 10, BLACK)
 
     # ── Pressure (lower half) ──
-    mid_y = (config.TOP_H + config.BOT_Y) // 2  # 135
+    pr_y = mid_y + 32          # label top: 167
+    pres_y = pr_y + 13         # value top: 180  (8px label + 5px gap)
     pr_label = "Pressure"
-    screen.text(pr_label,
-                panel_cx - len(pr_label) * 4,
-                mid_y + 10, BLACK)
-
-    ax, ay = config.COL1_X + 10, mid_y + 42
+    screen.text(pr_label, panel_cx - len(pr_label) * 4, pr_y, BLACK)
+    pres_str = state["pressure_str"]
+    pres_w = draw_large_number(screen, pres_str, panel_cx - 28, pres_y, seg_h, BLACK)
+    screen.text("inHg", panel_cx - 28 + pres_w + 3, pres_y + seg_h - 8, BLACK)
+    ax, ay = config.COL1_X + 10, pres_y + 11
     for i in range(4):
         hw = 10 - i * 2
         screen.hline(ax - hw + i, ay + i * 5, hw * 2 - i * 2, BLACK)
-
-    pres_str = state["pressure_str"]
-    pres_w = draw_large_number(screen, pres_str,
-                               panel_cx - 28, mid_y + 28,
-                               seg_h, BLACK)
-    screen.text("inHg", panel_cx - 28 + pres_w + 3,
-                mid_y + 28 + seg_h - 8, BLACK)
 
 
 # ═══════════════════════════════════════════════════════════════════
