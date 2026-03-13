@@ -182,8 +182,8 @@ def draw_compass(screen, cx, cy, radius, wind_deg):
     screen.text("E", cx + r + 2, cy - 4, BLACK)
     screen.text("W", cx - r - 10, cy - 4, BLACK)
 
-    # Arrow pointing in wind_deg direction (0=N, 90=E, clockwise)
-    a = (wind_deg - 90) * math.pi / 180
+    # Arrow points toward direction wind is travelling (opposite of reported origin)
+    a = (wind_deg + 90) * math.pi / 180
     cos_a = math.cos(a)
     sin_a = math.sin(a)
 
