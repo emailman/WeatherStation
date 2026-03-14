@@ -250,12 +250,14 @@ def draw_bottom_bar(screen, state):
 def draw_left_panel(screen, state):
     icon_cx = config.COL1_X // 2  # 198
 
-    # Even vertical distribution: 4 blocks (76+8+50+21=155 px), 5 gaps of 13 px
-    icon_cy        = config.TOP_H + 13 + 38       # 76  (icon radius=38)
-    cond_y         = icon_cy + 38 + 13 - 10        # 117
-    temp_y         = cond_y + 8 + 13               # 138
-    precip_label_y = temp_y + 50 + 13              # 211
-    precip_val_y   = precip_label_y + 8 + 5        # 224
+    # Top block (icon, cond, temp, hi/lo) packed near the top bar; precip
+    # anchored independently to leave clear visual space above it.
+    icon_cy        = config.TOP_H + 5 + 38    # 68  (5px gap from top bar)
+    cond_y         = icon_cy + 38 - 2         # 104  (closer to icon)
+    temp_y         = cond_y + 8 + 18         # 130  (50px tall, bottom=180)
+    hi_lo_y        = temp_y + 50 + 5          # 185  (bottom=193)
+    precip_label_y = 207                       # fixed; ~14px gap from hi/lo
+    precip_val_y   = precip_label_y + 8 + 5   # 220
 
     draw_weather_icon(screen, state["weather_code"], icon_cx, icon_cy, 38)
 
@@ -270,6 +272,9 @@ def draw_left_panel(screen, state):
     tx = max(4, icon_cx - approx_w // 2)
     draw_large_number(screen, temp_str, tx, temp_y, seg_h, BLACK)
 
+    hi_lo_str = "Hi:" + state["today_high_str"] + "  Lo:" + state["today_low_str"]
+    screen.text(hi_lo_str, icon_cx - len(hi_lo_str) * 4, hi_lo_y, BLACK)
+
     label = "Chance of precip"
     screen.text(label, icon_cx - len(label) * 4, precip_label_y, BLACK)
     precip_str = state["precip_pct_str"]
@@ -281,7 +286,7 @@ def draw_left_panel(screen, state):
 # ═══════════════════════════════════════════════════════════════════
 
 def draw_center_panel(screen, state):
-    panel_cx = (config.COL1_X + config.COL2_X) // 2 - 25  # 470
+    panel_cx = (config.COL1_X + config.COL2_X) // 2 - 15  # 480
     seg_h = 32
     mid_y = (config.TOP_H + config.BOT_Y) // 2  # 135
 
@@ -296,7 +301,7 @@ def draw_center_panel(screen, state):
     hum_str = str(state["humidity"])
     hum_w = draw_large_number(screen, hum_str, panel_cx - 18, hum_y, seg_h, BLACK)
     screen.text("%", panel_cx - 18 + hum_w + 2, hum_y + seg_h - 8, BLACK)
-    screen.ellipse(config.COL1_X + 16, hum_y + 11, 7, 10, BLACK)
+    screen.ellipse(config.COL1_X + 26, hum_y + 11, 7, 10, BLACK)
 
     # ── Pressure (lower half) ──
     pr_y = mid_y + 32          # label top: 167
@@ -306,7 +311,7 @@ def draw_center_panel(screen, state):
     pres_str = state["pressure_str"]
     pres_w = draw_large_number(screen, pres_str, panel_cx - 28, pres_y, seg_h, BLACK)
     screen.text("inHg", panel_cx - 28 + pres_w + 3, pres_y + seg_h - 8, BLACK)
-    ax, ay = config.COL1_X + 10, pres_y + 11
+    ax, ay = config.COL1_X + 20, pres_y + 11
     for i in range(4):
         hw = 10 - i * 2
         screen.hline(ax - hw + i, ay + i * 5, hw * 2 - i * 2, BLACK)

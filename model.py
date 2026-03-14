@@ -51,7 +51,8 @@ def fetch_weather(lat, lon, utc_offset_h=None):
         "?latitude={}&longitude={}"
         "&current=temperature_2m,relative_humidity_2m,surface_pressure,"
         "wind_speed_10m,wind_direction_10m,wind_gusts_10m,weather_code"
-        "&daily=sunrise,sunset,precipitation_probability_max"
+        "&daily=sunrise,sunset,precipitation_probability_max,"
+        "temperature_2m_max,temperature_2m_min"
         "&timezone=auto&forecast_days=1"
     ).format(lat, lon)
     print("GET", url)
@@ -70,7 +71,9 @@ def fetch_weather(lat, lon, utc_offset_h=None):
     gusts_kmh  = c.get("wind_gusts_10m",        0.0)
     press_hpa  = c.get("surface_pressure",      0.0)
 
-    precip = d["precipitation_probability_max"][0]
+    precip  = d["precipitation_probability_max"][0]
+    high_c  = d["temperature_2m_max"][0]
+    low_c   = d["temperature_2m_min"][0]
     return {
         "temp":       temp_c * 9 / 5 + 32,
         "humidity":   int(c.get("relative_humidity_2m", 0)),
@@ -82,6 +85,8 @@ def fetch_weather(lat, lon, utc_offset_h=None):
         "sunrise":    hhmm(d["sunrise"][0]),
         "sunset":     hhmm(d["sunset"][0]),
         "precip_pct": int(precip) if precip is not None else 0,
+        "today_high": high_c * 9 / 5 + 32,
+        "today_low":  low_c  * 9 / 5 + 32,
     }
 
 

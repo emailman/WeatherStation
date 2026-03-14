@@ -17,18 +17,19 @@ no API key required.
 +----------------------------------------+----------+------------------------+
 |                                        |          |         N              |
 |           [sun icon]                   | Humidity |       W (+) E          |
-|             Clear                      |  ## 55%  |         S              |
+|           Clear                        |  ## 55%  |         S              |
 |                                        |          |    Wind Speed          |
 |             72°F                       | Pressure |      12.3 mph          |
-|                                        | 29.92    |                        |
-|         Chance of precip               |   inHg   |    Wind Gust           |
-|              30%                       |          |      18.5 mph          |
+|         Hi:75F  Lo:52F                 | 29.92    |                        |
+|                                        |   inHg   |    Wind Gust           |
+|         Chance of precip               |          |      18.5 mph          |
+|              30%                       |          |                        |
 +----------------------------------------+----------+------------------------+
 |  * 07:08                                                          18:52 *  |
 +-----------------------------------------------------------------------------+
 ```
 
-- **Left panel** — WMO weather icon, condition text (e.g. "Clear"), large 7-segment temperature (°F), and today's chance of precipitation (%)
+- **Left panel** — WMO weather icon, condition text (e.g. "Clear"), large 7-segment temperature (°F), today's forecast high/low temps (°F), and today's chance of precipitation (%)
 - **Centre panel** — humidity (%) and barometric pressure (inHg)
 - **Right panel** — compass rose showing wind direction, wind speed (mph), and wind gust (mph)
 - **Top bar** — location (left), local time (centre), date (right); each centred in its third of the bar
@@ -177,7 +178,8 @@ Endpoint: `http://api.open-meteo.com/v1/forecast`
 
 Fields used: `temperature_2m` (°C), `relative_humidity_2m`, `surface_pressure`,
 `wind_speed_10m` (km/h), `wind_gusts_10m` (km/h), `wind_direction_10m`, `weather_code`,
-`daily/sunrise`, `daily/sunset`, `daily/precipitation_probability_max`.
+`daily/sunrise`, `daily/sunset`, `daily/precipitation_probability_max`,
+`daily/temperature_2m_max`, `daily/temperature_2m_min`.
 
 ## License
 

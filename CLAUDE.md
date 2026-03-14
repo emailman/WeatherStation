@@ -37,6 +37,8 @@ main.py        button/encoder ISRs + polling loop, wires the layers
     "sunrise":    str,     # "HH:MM"
     "sunset":     str,     # "HH:MM"
     "precip_pct": int,     # today's precipitation probability max (%)
+    "today_high": float,   # today's forecast high, °F
+    "today_low":  float,   # today's forecast low, °F
 }
 ```
 
@@ -52,6 +54,8 @@ main.py        button/encoder ISRs + polling loop, wires the layers
     "weather_code":   int,
     "condition_str":  str,   # e.g. "Clear", "Rain" — from wmo_condition(); used in left panel
     "precip_pct_str": str,   # e.g. "30%" — today's precipitation probability max
+    "today_high_str": str,   # e.g. "75F" — today's forecast high
+    "today_low_str":  str,   # e.g. "52F" — today's forecast low
     "sunrise":        str,
     "sunset":         str,
     "time_str":       str,   # e.g. "08:32:15 AM"
