@@ -33,6 +33,48 @@ def sync_ntp():
         return False
 
 
+def update_pressure_history(city_idx, pressure_inHg):
+    """Append pressure_inHg to /press_N.txt, trim to 3-hour window, return history.
+
+    Returns list of (timestamp_secs, pressure_inHg) — oldest first.
+    Returns [] if the RTC has not been synced (time.time() < 1_000_000).
+    """
+    now = time.time()
+    if now < 1_000_000:          # clock not yet synced — skip
+        return []
+    cutoff = now - 10800         # 3 hours ago
+    fname = "/press_{}.txt".format(city_idx)
+
+    # Load existing readings within the 3-hour window
+    history = []
+    try:
+        with open(fname, "r") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                parts = line.split(",")
+                if len(parts) == 2:
+                    ts = int(parts[0])
+                    if ts >= cutoff:
+                        history.append((ts, float(parts[1])))
+    except OSError:
+        pass   # file doesn't exist yet — start fresh
+
+    # Append new reading
+    history.append((now, round(pressure_inHg, 2)))
+
+    # Rewrite file (trim applied by only writing entries within window)
+    try:
+        with open(fname, "w") as f:
+            for ts, pr in history:
+                f.write("{},{}\n".format(ts, pr))
+    except OSError as e:
+        print("press history write error:", e)
+
+    return history
+
+
 def fetch_weather(lat, lon, utc_offset_h=None):
     """Fetch current conditions from Open-Meteo (free, no API key).
 

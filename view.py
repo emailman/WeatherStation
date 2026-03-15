@@ -306,7 +306,7 @@ def draw_center_panel(screen, state):
     # ── Pressure (lower half) ──
     pr_y = mid_y + 32          # label top: 167
     pres_y = pr_y + 13         # value top: 180  (8px label + 5px gap)
-    pr_label = "Pressure"
+    pr_label = state["pressure_label"]
     screen.text(pr_label, panel_cx - len(pr_label) * 4, pr_y, BLACK)
     pres_str = state["pressure_str"]
     pres_w = draw_large_number(screen, pres_str, panel_cx - 28, pres_y, seg_h, BLACK)

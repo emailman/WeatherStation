@@ -194,14 +194,17 @@ def main():
             try:
                 raw = model.fetch_weather(lat, lon, utc_h)
                 print("Data:", raw)
+                _press_hist = model.update_pressure_history(_active_city, raw["pressure"])
             except Exception as e:
                 print("Fetch error:", e)
+                _press_hist = []
                 if raw is None:
                     view.draw_error(screen, e)
 
             if raw is not None:
                 try:
-                    state = viewmodel.build_display_state(raw, name, utc_h)
+                    state = viewmodel.build_display_state(raw, name, utc_h,
+                                                          pressure_history=_press_hist)
                     view.draw_display(screen, state)
                     screen.show(mode=0)
                 except Exception as e:

@@ -43,6 +43,39 @@ def _format_pressure(press_inHg):
     return "{:.2f}".format(press_inHg)
 
 
+def _pressure_trend(history):
+    """Return a pressure trend label using linear regression over all readings.
+
+    Requires at least 4 readings (≈40 min at 10-min refresh) before reporting
+    a trend.  Using the best-fit slope across all points makes the result
+    resistant to single-reading noise/outliers.
+
+    Threshold: if the slope projects a total change of > 0.06 inHg
+    (≈ 2 hPa — the standard meteorological 'rising/falling' threshold for a
+    3-hour window) → Rising/Falling; otherwise Steady.
+    """
+    n = len(history)
+    if n < 4:
+        return "Pressure"
+    # Simple linear regression: y = slope*x + c, x = sample index
+    sx = sy = sxy = sx2 = 0
+    for i, (_, pr) in enumerate(history):
+        sx  += i
+        sy  += pr
+        sxy += i * pr
+        sx2 += i * i
+    denom = n * sx2 - sx * sx
+    if denom == 0:
+        return "Pressure-Steady"
+    slope = (n * sxy - sx * sy) / denom   # inHg per step
+    projected = slope * (n - 1)           # total fitted change over window
+    if projected > 0.06:
+        return "Pressure-Rising"
+    if projected < -0.06:
+        return "Pressure-Falling"
+    return "Pressure-Steady"
+
+
 def _format_wind_speed(mph):
     """Return wind speed string, e.g. '12.3 mph'."""
     return "{:.1f} mph".format(mph)
@@ -108,7 +141,7 @@ def build_forecast_state(forecast_raw, city_name=None, utc_offset_h=None):
     }
 
 
-def build_display_state(raw, city_name=None, utc_offset_h=None):
+def build_display_state(raw, city_name=None, utc_offset_h=None, pressure_history=None):
     """Convert a raw model dict into a display-state dict consumed by the view.
 
     Args:
@@ -138,6 +171,7 @@ def build_display_state(raw, city_name=None, utc_offset_h=None):
         "temp_str":       _format_temperature(raw["temp"]),
         "humidity":       raw["humidity"],
         "pressure_str":   _format_pressure(raw["pressure"]),
+        "pressure_label": _pressure_trend(pressure_history or []),
         "wind_speed_str": _format_wind_speed(raw["wind_speed"]),
         "wind_gust_str":  _format_wind_gust(raw["wind_gust"]),
         "wind_dir":       raw["wind_dir"],
