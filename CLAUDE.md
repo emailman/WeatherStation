@@ -120,9 +120,14 @@ Navigation:
 - STATE_FORECAST → bottom button → STATE_WEATHER (sets active city = forecast city)
 - STATE_WEATHER ↔ STATE_CITY_SELECT via rotary click
 
-City temps and conditions are cached in `_city_temps` / `_city_conditions` lists and
-refreshed on the same `REFRESH_SEC` timer as the weather display. `_refresh_flag = True`
-at startup triggers an immediate first fetch for both modes.
+Every refresh cycle (all three states) calls `_fetch_all(active_idx)`, a nested helper
+defined inside `main()` that loops all cities, updates `_city_temps` / `_city_conditions`
+in-place, writes each city's pressure history file via `model.update_pressure_history`,
+and returns `(raw_for_active, press_hist_for_active)` for use by `STATE_WEATHER`.
+
+`_refresh_flag = True` at startup triggers an immediate first fetch across all states.
+In `STATE_FORECAST`, `_fetch_all` runs before the forecast fetch so pressure files stay
+current even while the forecast screen is displayed.
 
 ## MicroPython constraints
 

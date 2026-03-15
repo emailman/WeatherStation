@@ -92,6 +92,31 @@ def main():
     _city_temps      = [None] * len(config.CITIES)
     _city_conditions = [None] * len(config.CITIES)
     last_ms           = time.ticks_ms()
+    _press_hist       = []
+
+    def _fetch_all(active_idx):
+        """Fetch current weather for all cities.
+
+        Updates _city_temps and _city_conditions in-place.
+        Updates each city's pressure history file.
+        Returns (raw_for_active, press_hist_for_active).
+        Returns (None, []) if the active city fetch fails.
+        """
+        result_raw  = None
+        result_hist = []
+        for i, (cname, clat, clon, cutc) in enumerate(config.CITIES):
+            print("Fetching", cname, "...")
+            try:
+                city_raw = model.fetch_weather(clat, clon, cutc)
+                _city_temps[i]      = viewmodel.format_city_temp(city_raw["temp"])
+                _city_conditions[i] = viewmodel.wmo_condition(city_raw["code"])
+                hist = model.update_pressure_history(i, city_raw["pressure"])
+                if i == active_idx:
+                    result_raw  = city_raw
+                    result_hist = hist
+            except Exception as e:
+                print("Fetch error:", cname, e)
+        return result_raw, result_hist
 
     view.draw_city_select(screen, config.CITIES, _cursor, _city_temps, _city_conditions)
     screen.show(mode=0)
@@ -126,14 +151,7 @@ def main():
             if elapsed >= config.REFRESH_SEC or _refresh_flag:
                 _refresh_flag = False
                 last_ms = time.ticks_ms()
-                for i, (name, lat, lon, utc_h) in enumerate(config.CITIES):
-                    print("Fetching temp for", name, "...")
-                    try:
-                        city_raw = model.fetch_weather(lat, lon, utc_h)
-                        _city_temps[i]      = viewmodel.format_city_temp(city_raw["temp"])
-                        _city_conditions[i] = viewmodel.wmo_condition(city_raw["code"])
-                    except Exception as e:
-                        print("Temp fetch error:", name, e)
+                _fetch_all(_active_city)
                 changed = True
 
             if changed:
@@ -154,6 +172,7 @@ def main():
             if elapsed >= config.REFRESH_SEC or _refresh_flag:
                 _refresh_flag = False
                 last_ms = time.ticks_ms()
+                _fetch_all(_active_city)
                 name, lat, lon, utc_h = config.CITIES[_forecast_city]
                 print("Fetching forecast for", name, "...")
                 try:
@@ -189,17 +208,12 @@ def main():
         if elapsed >= config.REFRESH_SEC or _refresh_flag:
             _refresh_flag = False
             last_ms = time.ticks_ms()
-            name, lat, lon, utc_h = config.CITIES[_active_city]
-            print("Fetching weather for", name, "...")
-            try:
-                raw = model.fetch_weather(lat, lon, utc_h)
-                print("Data:", raw)
-                _press_hist = model.update_pressure_history(_active_city, raw["pressure"])
-            except Exception as e:
-                print("Fetch error:", e)
-                _press_hist = []
-                if raw is None:
-                    view.draw_error(screen, e)
+            name, _, _, utc_h = config.CITIES[_active_city]
+            active_raw, _press_hist = _fetch_all(_active_city)
+            if active_raw is not None:
+                raw = active_raw
+            elif raw is None:
+                view.draw_error(screen, "Fetch failed")
 
             if raw is not None:
                 try:

@@ -30,7 +30,7 @@ no API key required.
 ```
 
 - **Left panel** — WMO weather icon, condition text (e.g. "Clear"), large 7-segment temperature (°F), today's forecast high/low temps (°F), and today's chance of precipitation (%)
-- **Centre panel** — humidity (%) and barometric pressure (inHg)
+- **Centre panel** — humidity (%) and barometric pressure (inHg) with trend label (Rising / Falling / Steady / Pressure) derived from the last 4 readings
 - **Right panel** — compass rose showing wind direction, wind speed (mph), and wind gust (mph)
 - **Top bar** — location (left), local time (centre), date (right); each centred in its third of the bar
 - **Bottom bar** — sunrise and sunset times
@@ -55,6 +55,8 @@ city selection screen. Rotate to move the cursor; press to confirm.
 Each row shows the city name, current weather condition, and temperature (°F).
 The highlighted row (cursor) is shown in inverse video.
 Data refreshes on the same 10-minute schedule as the weather display.
+Pressure history is accumulated for all cities in parallel, so switching cities
+shows a trend label sooner rather than waiting for 4 readings to build from scratch.
 
 ### 6-day forecast screen
 
