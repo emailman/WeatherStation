@@ -237,10 +237,19 @@ def _tiny_sun(screen, cx, cy, filled=True):
 def draw_bottom_bar(screen, state):
     screen.hline(0, config.BOT_Y, config.W, BLACK)
     y = config.BOT_Y + 6
-    _tiny_sun(screen, 12, y + 4, filled=False)
-    screen.text(state["sunrise"], 26, y, BLACK)
-    screen.text(state["sunset"], config.W - 70, y, BLACK)
-    _tiny_sun(screen, config.W - 14, y + 4)
+    cy = y + 4
+
+    # Sunrise: [sun] [HH:MM AM] Sunrise  — centred at 1/3 of display (x=264)
+    # Group width: 16 (icon) + 4 + 64 (8-char time) + 4 + 56 (Sunrise) = 144px
+    _tiny_sun(screen, 200, cy, filled=False)
+    screen.text(state["sunrise"], 212, y, BLACK)
+    screen.text("Sunrise", 280, y, BLACK)
+
+    # Sunset:  [sun] [HH:MM PM] Sunset   — centred at 2/3 of display (x=528)
+    # Group width: 16 (icon) + 4 + 64 (8-char time) + 4 + 48 (Sunset) = 136px
+    _tiny_sun(screen, 460, cy)
+    screen.text(state["sunset"], 472, y, BLACK)
+    screen.text("Sunset", 540, y, BLACK)
 
 
 # ═══════════════════════════════════════════════════════════════════

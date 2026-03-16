@@ -25,7 +25,7 @@ no API key required.
 |         Chance of precip               |          |      18.5 mph          |
 |              30%                       |          |                        |
 +----------------------------------------+----------+------------------------+
-|  * 07:08                                                          18:52 *  |
+|     * 05:44 AM  Sunrise                  * 07:22 PM  Sunset                |
 +-----------------------------------------------------------------------------+
 ```
 
@@ -33,7 +33,7 @@ no API key required.
 - **Centre panel** — humidity (%) and barometric pressure (inHg) with trend label (Rising / Falling / Steady / Pressure) derived from the last 4 readings
 - **Right panel** — compass rose showing wind direction, wind speed (mph), and wind gust (mph)
 - **Top bar** — location (left), local time (centre), date (right); each centred in its third of the bar
-- **Bottom bar** — sunrise and sunset times
+- **Bottom bar** — sunrise (`[sun] HH:MM AM Sunrise`) centred at 1/3 of the bar; sunset (`[sun] HH:MM PM Sunset`) centred at 2/3; times shown in 12-hour format
 
 ### City selection screen
 

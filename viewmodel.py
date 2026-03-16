@@ -104,6 +104,15 @@ def _format_time(utc_offset_h):
     return time_str, date_str
 
 
+def _format_12h(hhmm):
+    """Convert "HH:MM" 24-hour string to zero-padded 12-hour "HH:MM AM/PM"."""
+    h = int(hhmm[:2])
+    m = hhmm[3:]
+    am_pm = "AM" if h < 12 else "PM"
+    h12 = h % 12 or 12
+    return "{:02d}:{} {}".format(h12, m, am_pm)
+
+
 def build_forecast_state(forecast_raw, city_name=None, utc_offset_h=None):
     """Convert a list of daily forecast dicts into a display-state dict for draw_forecast().
 
@@ -156,8 +165,8 @@ def build_display_state(raw, city_name=None, utc_offset_h=None, pressure_history
         wind_speed_str str   e.g. "12.3 mph"
         wind_dir       int   degrees
         weather_code   int   WMO code
-        sunrise        str   "HH:MM"
-        sunset         str   "HH:MM"
+        sunrise        str   "HH:MM AM/PM"
+        sunset         str   "HH:MM AM/PM"
         time_str       str   "HH:MM:SS AM"
         date_str       str   "MM/DD/YYYY"
         location       str   location name
@@ -180,8 +189,8 @@ def build_display_state(raw, city_name=None, utc_offset_h=None, pressure_history
         "precip_pct_str": str(raw["precip_pct"]) + "%",
         "today_high_str": str(int(round(raw["today_high"]))) + "F",
         "today_low_str":  str(int(round(raw["today_low"])))  + "F",
-        "sunrise":        raw["sunrise"],
-        "sunset":         raw["sunset"],
+        "sunrise":        _format_12h(raw["sunrise"]),
+        "sunset":         _format_12h(raw["sunset"]),
         "time_str":       time_str,
         "date_str":       date_str,
         "location":       city_name,
