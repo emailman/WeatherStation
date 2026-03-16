@@ -297,14 +297,18 @@ def draw_left_panel(screen, state):
 def draw_center_panel(screen, state):
     panel_cx = (config.COL1_X + config.COL2_X) // 2 - 15  # 480
     seg_h = 32
-    mid_y = (config.TOP_H + config.BOT_Y) // 2  # 135
 
-    # Each half (110 px) centres its block (label 8 + gap 5 + value 32 = 45 px)
-    # leaving 32 px margins top and bottom within each half.
+    # Panel spans TOP_H(25) to BOT_Y(245) = 220px, divided into three 73px thirds.
+    # Boundaries: top_third=25..98, mid_third=98..171, bot_third=171..245.
+    # Each content block is label(8) + gap(5) + value(32) = 45px, centred in its third
+    # leaving (73-45)//2 = 14px margins top and bottom.
+    top_third = config.TOP_H           # 25
+    mid_third = config.TOP_H + 73      # 98
+    # bot_third = config.TOP_H + 146   # 171  (reserved for future content)
 
-    # ── Humidity (upper half) ──
-    hy_y = config.TOP_H + 32   # label top: 57
-    hum_y = hy_y + 13          # value top: 70  (8px label + 5px gap)
+    # ── Humidity (top third) ──
+    hy_y  = top_third + 14             # label top: 39
+    hum_y = hy_y + 13                  # value top: 52  (8px label + 5px gap)
     hy_label = "Humidity"
     screen.text(hy_label, panel_cx - len(hy_label) * 4, hy_y, BLACK)
     hum_str = str(state["humidity"])
@@ -312,9 +316,9 @@ def draw_center_panel(screen, state):
     screen.text("%", panel_cx - 18 + hum_w + 2, hum_y + seg_h - 8, BLACK)
     screen.ellipse(config.COL1_X + 26, hum_y + 11, 7, 10, BLACK)
 
-    # ── Pressure (lower half) ──
-    pr_y = mid_y + 32          # label top: 167
-    pres_y = pr_y + 13         # value top: 180  (8px label + 5px gap)
+    # ── Pressure (middle third) ──
+    pr_y   = mid_third + 14            # label top: 112
+    pres_y = pr_y + 13                 # value top: 125  (8px label + 5px gap)
     pr_label = state["pressure_label"]
     screen.text(pr_label, panel_cx - len(pr_label) * 4, pr_y, BLACK)
     pres_str = state["pressure_str"]
@@ -324,6 +328,8 @@ def draw_center_panel(screen, state):
     for i in range(4):
         hw = 10 - i * 2
         screen.hline(ax - hw + i, ay + i * 5, hw * 2 - i * 2, BLACK)
+
+    # ── Bottom third (171..245) reserved for future content ──
 
 
 # ═══════════════════════════════════════════════════════════════════
