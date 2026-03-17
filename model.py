@@ -94,8 +94,8 @@ def fetch_weather(lat, lon, utc_offset_h=None):
         "&current=temperature_2m,relative_humidity_2m,surface_pressure,"
         "wind_speed_10m,wind_direction_10m,wind_gusts_10m,weather_code"
         "&daily=sunrise,sunset,precipitation_probability_max,"
-        "temperature_2m_max,temperature_2m_min"
-        "&timezone=auto&forecast_days=1"
+        "temperature_2m_max,temperature_2m_min,rain_sum,snowfall_sum"
+        "&timezone=auto&forecast_days=1&past_days=1"
     ).format(lat, lon)
     print("GET", url)
     resp = urequests.get(url)
@@ -113,9 +113,9 @@ def fetch_weather(lat, lon, utc_offset_h=None):
     gusts_kmh  = c.get("wind_gusts_10m",        0.0)
     press_hpa  = c.get("surface_pressure",      0.0)
 
-    precip  = d["precipitation_probability_max"][0]
-    high_c  = d["temperature_2m_max"][0]
-    low_c   = d["temperature_2m_min"][0]
+    precip  = d["precipitation_probability_max"][1]   # [0]=yesterday, [1]=today
+    high_c  = d["temperature_2m_max"][1]
+    low_c   = d["temperature_2m_min"][1]
     return {
         "temp":       temp_c * 9 / 5 + 32,
         "humidity":   int(c.get("relative_humidity_2m", 0)),
@@ -124,11 +124,13 @@ def fetch_weather(lat, lon, utc_offset_h=None):
         "wind_gust":  gusts_kmh * 0.621371,
         "wind_dir":   int(c.get("wind_direction_10m",   0)),
         "code":       int(c.get("weather_code",         0)),
-        "sunrise":    hhmm(d["sunrise"][0]),
-        "sunset":     hhmm(d["sunset"][0]),
+        "sunrise":    hhmm(d["sunrise"][1]),
+        "sunset":     hhmm(d["sunset"][1]),
         "precip_pct": int(precip) if precip is not None else 0,
         "today_high": high_c * 9 / 5 + 32,
         "today_low":  low_c  * 9 / 5 + 32,
+        "rain_24h":   round((d["rain_sum"][0] or 0.0) / 25.4, 2),   # mm → inches
+        "snow_24h":   round((d["snowfall_sum"][0] or 0.0) / 2.54, 2),  # cm → inches
     }
 
 

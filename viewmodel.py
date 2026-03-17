@@ -194,4 +194,6 @@ def build_display_state(raw, city_name=None, utc_offset_h=None, pressure_history
         "time_str":       time_str,
         "date_str":       date_str,
         "location":       city_name,
+        "rain_24h_str":   "{:.1f}".format(raw["rain_24h"]),
+        "snow_24h_str":   "{:.1f}".format(raw["snow_24h"]),
     }

@@ -39,6 +39,8 @@ main.py        button/encoder ISRs + polling loop, wires the layers
     "precip_pct": int,     # today's precipitation probability max (%)
     "today_high": float,   # today's forecast high, °F
     "today_low":  float,   # today's forecast low, °F
+    "rain_24h":   float,   # yesterday's observed rain total, inches (mm → in)
+    "snow_24h":   float,   # yesterday's observed snowfall total, inches (cm → in)
 }
 ```
 
@@ -61,6 +63,8 @@ main.py        button/encoder ISRs + polling loop, wires the layers
     "time_str":       str,   # e.g. "08:32:15 AM"
     "date_str":       str,   # e.g. "03/10/2026"
     "location":       str,
+    "rain_24h_str":   str,   # e.g. "0.3" — yesterday's rain total, inches (1 decimal)
+    "snow_24h_str":   str,   # e.g. "1.2" — yesterday's snowfall total, inches (1 decimal)
 }
 ```
 
@@ -188,7 +192,7 @@ Panel centres derived from these:
 
 **Change units:** Edit `_format_temperature()`, `_format_wind_speed()`, or
 `_format_wind_gust()` in `viewmodel.py`. Also update the unit suffix strings in
-`view.draw_center_panel()` for pressure.
+`view.draw_center_panel()` for pressure and precipitation.
 
 **Add a new WMO code:** Add an `elif` branch in `view.draw_weather_icon()` and
 a matching branch in `viewmodel.wmo_condition()`. The condition string is shown

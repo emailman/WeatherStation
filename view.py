@@ -329,7 +329,15 @@ def draw_center_panel(screen, state):
         hw = 10 - i * 2
         screen.hline(ax - hw + i, ay + i * 5, hw * 2 - i * 2, BLACK)
 
-    # ── Bottom third (171..245) reserved for future content ──
+    # ── 24-Hour Precipitation (bottom third, y=171..245) ──
+    bot_third = config.TOP_H + 146  # 171
+    pcx = (config.COL1_X + config.COL2_X) // 2  # 495 — true panel centre for text
+    title = "24 Hr Precip Total"
+    screen.text(title, pcx - len(title) * 4, bot_third + 11, BLACK)
+    rain_line = "Rain Total: " + state["rain_24h_str"] + " in"
+    screen.text(rain_line, pcx - len(rain_line) * 4, bot_third + 29, BLACK)
+    snow_line = "Snow Total: " + state["snow_24h_str"] + " in"
+    screen.text(snow_line, pcx - len(snow_line) * 4, bot_third + 47, BLACK)
 
 
 # ═══════════════════════════════════════════════════════════════════

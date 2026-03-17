@@ -23,14 +23,17 @@ no API key required.
 |         Hi:75F  Lo:52F                 | 29.92    |                        |
 |                                        |   inHg   |    Wind Gust           |
 |         Chance of precip               |          |      18.5 mph          |
-|              30%                       |          |                        |
+|              30%                       | 24 Hr    |                        |
+|                                        | Precip   |                        |
+|                                        | Rain:0.0 |                        |
+|                                        | Snow:0.0 |                        |
 +----------------------------------------+----------+------------------------+
 |     * 05:44 AM  Sunrise                  * 07:22 PM  Sunset                |
 +-----------------------------------------------------------------------------+
 ```
 
 - **Left panel** — WMO weather icon, condition text (e.g. "Clear"), large 7-segment temperature (°F), today's forecast high/low temps (°F), and today's chance of precipitation (%)
-- **Centre panel** — humidity (%) and barometric pressure (inHg) with trend label (Rising / Falling / Steady / Pressure) derived from the last 4 readings
+- **Centre panel** — humidity (%), barometric pressure (inHg) with trend label (Rising / Falling / Steady), and 24-hour observed precipitation totals (rain and snow, in inches)
 - **Right panel** — compass rose showing wind direction, wind speed (mph), and wind gust (mph)
 - **Top bar** — location (left), local time (centre), date (right); each centred in its third of the bar
 - **Bottom bar** — sunrise (`[sun] HH:MM AM Sunrise`) centred at 1/3 of the bar; sunset (`[sun] HH:MM PM Sunset`) centred at 2/3; times shown in 12-hour format
@@ -181,7 +184,11 @@ Endpoint: `http://api.open-meteo.com/v1/forecast`
 Fields used: `temperature_2m` (°C), `relative_humidity_2m`, `surface_pressure`,
 `wind_speed_10m` (km/h), `wind_gusts_10m` (km/h), `wind_direction_10m`, `weather_code`,
 `daily/sunrise`, `daily/sunset`, `daily/precipitation_probability_max`,
-`daily/temperature_2m_max`, `daily/temperature_2m_min`.
+`daily/temperature_2m_max`, `daily/temperature_2m_min`,
+`daily/rain_sum` (mm, converted to inches), `daily/snowfall_sum` (cm, converted to inches).
+
+`past_days=1` is added to the forecast request so that yesterday's observed rain/snow totals
+are available at index `[0]` of the daily arrays, providing the "24-hour precipitation" values.
 
 ## License
 
